@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Untitled Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+</head>
+
+<body>
+
+    <script>
+        var svg = d3.select('body').append('svg').attr({
+            'width': 600,
+            'height':350
+        });
+
+        
+        function make_ob(svg,ob,dataset){
+            var selection =svg.selectAll(ob).data(dataset);
+            selection.enter().append(ob);
+            selection.exit().remove();
+            
+            return svg.selectAll(ob);
+        }
+        
+        d3.json("invoice-taipei.json", function(dataset) {
+
+            var body = d3.select('body');
+
+            fDataSet = dataset.filter(function(d) {
+                return d.amount > 1000000000 && d.date === "2016/8/1" && d.city === "臺北市";
+            })
+
+            //console.log(fDataSet);
+
+            var lineHeight = 30;
+            
+            var xScale = d3.scale.linear()
+                    .domain([
+                            d3.min(fDataSet,function(d){return d.number;}),
+                            d3.max(fDataSet,function(d){return d.number;}),
+                            ])
+                    .range([10,200]);
+            
+            make_ob(svg,"rect",fDataSet).attr({
+                    x: 250,
+                    y: function(d,i){ return 10+(30*i); },
+                    width: function(d,i){return xScale(d.number);},
+                    height: 15,
+                    fill: "red"
+                });
+            
+            make_ob(svg,"text",fDataSet).attr({
+                    x: 10,
+                    y: function(d,i){return 20 + ( lineHeight * i);},
+                    fill: "black",
+                    "font-size": 12,
+                }).text(
+                    function(d){
+                        return d.industry + "," + d.number;
+                    })
+            
+
+        });
+
+        //CSV預處理
+        function mid(d) {
+            d.number = +d.number;
+            d.amount = +d.amount;
+            return d;
+        }
+
+        
+        //-----------------------------------------------------------------
+        d3.select('body').append('hr');
+        
+        var arr = [85, 60, 99, 49, 77, 82];
+       
+       bind_2(arr);
+       render_2();
+       
+       function bind_2(dataSet){
+           var selection =d3.select("body").selectAll("div").data(dataSet);
+           selection.enter().append('div');
+           selection.exit().remove();
+       }
+       
+       function render_2(){
+           d3.selectAll('body>div').text(function(d,i){
+               return (i+1)+":"+d;
+           })
+           .style({
+               color:function(d){
+                   if( d<70 ){
+                       return "red";
+                   }else{
+                       return "lightgreen";
+                   }
+               }
+           });
+       }
+        
+        
+        //-----------------------------------------------------------------
+        d3.select('body').append('hr');
+    
+    </script>
+    
+    
+    
+    <input type="button" value="新增" onClick="update();">
+    <script>
+        
+       var arr = [85, 60, 99, 49, 77, 82];
+       var w = 900;
+       var h = 200;
+       var p = 50;
+       var rect_w = 40;
+       var rect_m = 5;
+       
+       
+       
+       
+       function create_svg(){
+           d3.select("body").append("svg")
+           .attr({
+               width:w,
+               height:h,
+               id:"bar-chart"
+           });
+           
+           
+       }
+       
+       
+       function bind(arr){
+           var selection =d3.select("#bar-chart").selectAll("rect").data(arr);
+           selection.enter().append('rect');
+           selection.exit().remove();
+           
+           var selection =d3.select("#bar-chart").selectAll("text").data(arr);
+           selection.enter().append('text');
+           selection.exit().remove();
+       }
+       
+       function render(){
+           d3.selectAll('#bar-chart>rect').attr({
+               x:function(d,i){return p+(i*(rect_w+rect_m))},
+               y:function(d){return h-p-d;},
+               width:rect_w,
+               height:function(d){return d;},
+               fill:function(d){ if(d<70) return "red"; else return "lightgreen"; }
+           });
+           
+           d3.selectAll('#bar-chart>text').attr({
+               x:function(d,i){return p+(i*(rect_w+rect_m))+10},
+               y:function(d){return h-p+20;},
+               width:rect_w,
+               height:function(d){return d;},
+               fill:function(d){ return d; }
+           })
+            .text(function(d){ return d; });
+           
+       }
+       
+       function rand(min,max){
+            var rScale = d3.scale.linear()
+            .domain([0,1]).rangeRound([min,max]);
+           return rScale( Math.random() );
+        }
+       
+       function update(){
+           var num = rand(10,100);
+           arr.push(num);
+           bind(arr);
+           render();
+       }
+        
+        create_svg();
+       bind(arr);
+       render();
+    </script>
+
+
+    <script>
+        //-------------------------------------------------------
+        d3.select('body').append('hr');
+        d3.select('body').append("div").text("第4題請自行打開console查看");
+        
+        var index =  ["中國國民黨", "民主進步黨", "時代力量", "無黨團結聯盟","親民黨"];
+        var color = ["blue","green","yellow","gray","orange"]
+        var xScale = d3.scale.ordinal()
+              .domain(index)
+              .range(color);
+
+        console.log(xScale("無黨團結聯盟"));
+
+    </script>
+
+
+
+</body>
+
+</html>
